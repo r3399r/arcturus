@@ -1,49 +1,25 @@
+import moment from 'moment';
 import React, { useState } from 'react';
 import { Button, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSelector } from 'react-redux';
+import { Accounting } from 'src/model/Accounting';
+import { RootState } from 'src/redux/store';
 import EditModal from './EditModal';
 
-const data = [
-  'a',
-  'acvddd',
-  'c',
-  'd',
-  'e',
-  'b',
-  'c',
-  'd',
-  'e',
-  'b',
-  'c',
-  'd',
-  'e',
-  'b',
-  'c',
-  'd',
-  'e',
-  'b',
-  'c',
-  'd',
-  'e',
-  'b',
-  'c',
-  'd',
-  'e',
-];
-const total = 1000;
-
 const Home = () => {
+  const wallet = useSelector((rootState: RootState) => rootState.wallet);
   const [showModal, setShowModal] = useState<boolean>(false);
   const onAdd = () => {
     setShowModal(true);
   };
 
-  const onSubmit = () => {
+  const closeModal = () => {
     setShowModal(false);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.current}>目前餘額: {total}</Text>
+      <Text style={styles.current}>目前餘額: {wallet.balance}</Text>
       <View style={styles.button}>
         <Button title="新增帳目" onPress={onAdd} />
       </View>
@@ -53,14 +29,14 @@ const Home = () => {
         <Text style={styles.headItem}>備註</Text>
       </View>
       <ScrollView>
-        {data.map((v: string, i: number) => (
+        {wallet.accountings.map((v: Accounting, i: number) => (
           <View key={i} style={[styles.item, i % 2 === 0 ? styles.even : styles.odd]}>
-            <Text>{v}</Text>
+            <Text>{moment(v.date).format('YYYY-MM-DD')}</Text>
           </View>
         ))}
       </ScrollView>
       <Modal visible={showModal} animationType="slide">
-        <EditModal onSubmit={onSubmit} />
+        <EditModal closeModal={closeModal} />
       </Modal>
     </View>
   );
