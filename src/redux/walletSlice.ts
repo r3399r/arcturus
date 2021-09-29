@@ -43,10 +43,16 @@ export const walletSlice = createSlice({
       state.accountings[action.payload.i] = newAccounting;
       state.accountings = state.accountings.sort(compareKey('date', true));
     },
+    deleteAccounting: (state: WalletState, action: PayloadAction<number>) => {
+      const accounting = state.accountings[action.payload];
+      if (accounting.type === 'add') state.balance -= accounting.amount;
+      else if (accounting.type === 'minus') state.balance += accounting.amount;
+      state.accountings.splice(action.payload, 1);
+    },
   },
 });
 
 // action creators are generated for each case reducer function
-export const { addAccounting, editAccounting } = walletSlice.actions;
+export const { addAccounting, editAccounting, deleteAccounting } = walletSlice.actions;
 
 export default walletSlice.reducer;

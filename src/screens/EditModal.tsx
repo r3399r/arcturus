@@ -17,7 +17,7 @@ const EditModal = ({ closeModal, target }: Props) => {
   const wallet = useSelector((rootState: RootState) => rootState.wallet);
   const [type, setType] = useState<string>('add');
   const [date, setDate] = useState<Date>(new Date());
-  const [amount, setAmount] = useState<number>(0);
+  const [amount, setAmount] = useState<number>();
   const [note, setNote] = useState<string>('');
   const [show, setShow] = useState<boolean>(false);
 
@@ -36,7 +36,10 @@ const EditModal = ({ closeModal, target }: Props) => {
     setDate(currentDate);
   };
 
-  const onChangeMoney = (v: string) => setAmount(Number(v));
+  const onChangeAmount = (v: string) => {
+    if (v === '') setAmount(undefined);
+    if (/^[0-9]+$/g.test(v)) setAmount(Number(v));
+  };
 
   const onChangeNote = (v: string) => setNote(v);
 
@@ -45,7 +48,7 @@ const EditModal = ({ closeModal, target }: Props) => {
   const onValueChange = (newValue: string) => setType(newValue);
 
   const onSubmit = () => {
-    const accounting = { type, date: moment(date).valueOf(), amount, note };
+    const accounting = { type, date: moment(date).valueOf(), amount: amount || 0, note };
     if (target === undefined) dispatch(addAccounting(accounting));
     else dispatch(editAccounting({ i: target, accounting }));
     closeModal();
@@ -54,6 +57,8 @@ const EditModal = ({ closeModal, target }: Props) => {
   const onCancel = () => {
     closeModal();
   };
+
+  const inputAmount = amount === undefined ? '' : String(amount);
 
   return (
     <View style={styles.container}>
@@ -87,9 +92,10 @@ const EditModal = ({ closeModal, target }: Props) => {
         <Text style={[styles.text, styles.key]}>金額</Text>
         <TextInput
           style={[styles.value, styles.text]}
+          placeholder="金額"
           keyboardType="numeric"
-          onChangeText={onChangeMoney}
-          value={String(amount)}
+          onChangeText={onChangeAmount}
+          value={inputAmount}
         />
       </View>
       <View style={styles.item}>

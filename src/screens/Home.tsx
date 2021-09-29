@@ -10,25 +10,31 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Accounting } from 'src/model/Accounting';
 import { RootState } from 'src/redux/store';
+import { deleteAccounting } from 'src/redux/walletSlice';
 import { getWeekdayInChinese } from 'src/util/dateHelper';
 import EditModal from './EditModal';
 
 const Home = () => {
+  const dispatch = useDispatch();
   const wallet = useSelector((rootState: RootState) => rootState.wallet);
   const [editTarget, setEditTarget] = useState<number>();
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const addAccounting = () => {
+  const onAdd = () => {
     setEditTarget(undefined);
     setShowModal(true);
   };
 
-  const editAccounting = (i: number) => () => {
+  const onEdit = (i: number) => () => {
     setEditTarget(i);
     setShowModal(true);
+  };
+
+  const onDelete = (i: number) => () => {
+    dispatch(deleteAccounting(i));
   };
 
   const closeModal = () => {
@@ -41,9 +47,13 @@ const Home = () => {
       undefined,
       [
         {
+          text: '刪除',
+          onPress: onDelete(i),
+        },
+        {
           text: '沒事',
         },
-        { text: '修改', onPress: editAccounting(i) },
+        { text: '修改', onPress: onEdit(i) },
       ],
       { cancelable: true },
     );
@@ -53,7 +63,7 @@ const Home = () => {
     <View style={styles.container}>
       <Text style={styles.current}>目前餘額: {wallet.balance}</Text>
       <View style={styles.button}>
-        <Button title="新增帳目" onPress={addAccounting} />
+        <Button title="新增帳目" onPress={onAdd} />
       </View>
       <View style={styles.head}>
         <Text style={styles.headItem}>日期</Text>
