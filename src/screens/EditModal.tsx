@@ -1,22 +1,34 @@
 import DateTimePicker, { Event } from '@react-native-community/datetimepicker';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-import { useDispatch } from 'react-redux';
-import { addAccounting } from 'src/redux/walletSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'src/redux/store';
+import { addAccounting, editAccounting } from 'src/redux/walletSlice';
 
 type Props = {
   closeModal: () => void;
+  target?: number;
 };
 
-const EditModal = ({ closeModal }: Props) => {
+const EditModal = ({ closeModal, target }: Props) => {
   const dispatch = useDispatch();
+  const wallet = useSelector((rootState: RootState) => rootState.wallet);
   const [type, setType] = useState<string>('add');
   const [date, setDate] = useState<Date>(new Date());
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState<string>('');
   const [show, setShow] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (target !== undefined) {
+      setType(wallet.accountings[target].type);
+      setDate(new Date(wallet.accountings[target].date));
+      setAmount(wallet.accountings[target].amount);
+      setNote(wallet.accountings[target].note);
+    }
+  }, [target]);
 
   const onChange = (event: Event, selectedDate?: Date) => {
     const currentDate = selectedDate || date;
@@ -33,7 +45,9 @@ const EditModal = ({ closeModal }: Props) => {
   const onValueChange = (newValue: string) => setType(newValue);
 
   const onSubmit = () => {
-    dispatch(addAccounting({ type, date: moment(date).format('YYYY-MM-DD'), amount, note }));
+    const accounting = { type, date: moment(date).valueOf(), amount, note };
+    if (target === undefined) dispatch(addAccounting(accounting));
+    else dispatch(editAccounting({ i: target, accounting }));
     closeModal();
   };
 

@@ -1,20 +1,60 @@
-import { configureStore, EnhancedStore, PayloadAction } from '@reduxjs/toolkit';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  combineReducers,
+  configureStore,
+  EmptyObject,
+  EnhancedStore,
+  PayloadAction,
+} from '@reduxjs/toolkit';
+import { CurriedGetDefaultMiddleware } from '@reduxjs/toolkit/dist/getDefaultMiddleware';
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from 'redux-persist';
+import { PersistPartial } from 'redux-persist/lib/persistReducer';
 import walletReducer, { WalletState } from './walletSlice';
-
-let store: EnhancedStore<RootState>;
 
 export type RootState = {
   wallet: WalletState;
 };
 
+let store: EnhancedStore<RootState & PersistPartial>;
+
+const persistConfig = {
+  key: 'root',
+  storage: AsyncStorage,
+};
+
+const rootReducer = combineReducers({
+  wallet: walletReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const configStore = () => {
   store = configureStore({
-    reducer: {
-      wallet: walletReducer,
-    },
+    reducer: persistedReducer,
+    middleware: (
+      getDefaultMiddleware: CurriedGetDefaultMiddleware<
+        EmptyObject & {
+          wallet: WalletState;
+        } & PersistPartial
+      >,
+    ) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
   });
 
-  return store;
+  return { store, persistor: persistStore(store) };
 };
 
 export const getState = () => store.getState();
