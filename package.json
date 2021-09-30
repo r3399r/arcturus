@@ -16,7 +16,7 @@
     "lint": "run-s lint:*",
     "fix": "run-s fix:*",
     "pre:commit": "run-s lint",
-    "build:android": "expo build:android",
+    "build:android": "expo build:android -t apk",
     "build:ios": "expo build:ios"
   },
   "dependencies": {

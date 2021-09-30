@@ -99,10 +99,10 @@ const EditModal = ({ closeModal, target }: Props) => {
         />
       </View>
       <View style={styles.item}>
-        <Text style={[styles.text, styles.key]}>備註</Text>
+        <Text style={[styles.text, styles.key]}>項目</Text>
         <TextInput
           style={[styles.value, styles.text]}
-          placeholder="備註"
+          placeholder="項目"
           onChangeText={onChangeNote}
           value={note}
         />

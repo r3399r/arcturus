@@ -68,7 +68,7 @@ const Home = () => {
       <View style={styles.head}>
         <Text style={styles.headItem}>日期</Text>
         <Text style={styles.headItem}>金額</Text>
-        <Text style={styles.headItem}>備註</Text>
+        <Text style={styles.headItem}>項目</Text>
       </View>
       <ScrollView>
         {wallet.accountings.map((v: Accounting, i: number) => (
